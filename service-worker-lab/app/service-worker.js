@@ -15,11 +15,60 @@ limitations under the License.
 */
 (function() {
   'use strict';
+   var CACHE_NAME = 'staticCache';
+   var urlsToCache = ['.', 'index.html', 'assets/style.css'];
+
+   var fetchAndCache = function(url){
+    return fetch(url)
+   .then(function(response){
+      if (!response.ok) {
+        throw Error(response.statusText);
+      }
+      
+      return caches.open(CACHE_NAME)
+      .then(function(cache){
+        cache.put(url, response.clone());
+        return response;
+      });
+    })
+    .catch(function(err) { 
+      console.log('Request failed : ', err);
+    });
+  }
 
   // TODO - 3.1: Add install and activate event listeners
+  self.addEventListener('install', function(event){ 
+    console.log('Installing the service worker...');
+    event.waitUntil(
+      caches.open(CACHE_NAME)
+      .then(function(cache){
+        return cache.addAll(urlsToCache);
+      })
+      .catch(function(err){
+        console.log(err);
+      })
+    );
+  });
+
+
+  self.addEventListener('activated', function(event) {
+    console.log('Service worker has been activated');
+  });
 
   // TODO - 3.3: Add a comment to change the service worker
-
+  // I'am a new service worker
+  self.skipWaiting();
   // TODO - 4: Add fetch listener
+  self.addEventListener('fetch', function(event) { 
+    console.log('A fetch event occured : ' + event.request.url);
+    event.respondWith(
+      caches.match(event.request)
+      .then(function(response){
+        //return response || fetch(event.request);
+        return response || fetchAndCache(event.request);
+      })
+    );
+  });
+
 
 })();

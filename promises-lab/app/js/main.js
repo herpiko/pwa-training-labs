@@ -19,6 +19,14 @@ var app = (function() {
 
   function getImageName(country) {
     // TODO 2.1 - create a promise
+    return new Promise(function(resolve, reject){
+      setTimeout(function(){
+        if (country.toLowerCase() === 'spain' || country.toLowerCase() === 'chile' || country.toLowerCase() === 'peru') {
+          return resolve(country.toLowerCase() + '.png');
+        }
+        return reject(Error('Not a valid country name'));
+      }, 1000);
+    });
   }
 
   function isSpain(country) {
@@ -27,6 +35,12 @@ var app = (function() {
 
   function flagChain(country) {
     // TODO 2.2 - use the promise
+    getImageName(country)
+    .then(fetchFlag)
+    .then(processFlag)
+    .then(appendFlag) 
+    .then(logSuccess)
+    .catch(logError);
   }
 
   function spainTest(country) {

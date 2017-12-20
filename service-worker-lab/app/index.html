@@ -41,8 +41,18 @@ limitations under the License.
     <script>
       (function() {
         'use strict';
+        if (!('serviceWorker' in navigator)) {
+          console.log('Service worker is not supported'); 
+        }
 
         // TODO - 2: Register the service worker
+        navigator.serviceWorker.register('service-worker.js', {})
+        .then(function(registration){
+          console.log('Service worker registered on the scope : ' + registration.scope);
+        })
+        .catch(function(){ 
+          console.log('Failed to register the service worker');
+        });
 
       })();
     </script>
